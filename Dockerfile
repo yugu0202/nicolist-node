@@ -1,7 +1,11 @@
-FROM node:14-alpine
+FROM node:16
 
-WORKDIR /app
+ENV LANG ja_JP.UTF-8
 
-EXPOSE 8000
+RUN apt update && apt -y upgrade
+
+RUN apt install -y locales fonts-ipafont fonts-ipaexfont && echo "ja_JP UTF-8" > /etc/locale.gen && locale-gen
+
+RUN apt install -y chromium
 
 CMD ["sh"]
