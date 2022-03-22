@@ -10,7 +10,7 @@ const reader = require("readline").createInterface({
 const _sleep = (ms) => new Promise((resolve) => setTimeout(resolve,ms));
 
 const HEADER = {"User-Agent":"nicolist"}
-const ROOT_URL = "https://www.nicovideo.jp";
+const BASE_URL = "https://www.nicovideo.jp";
 const LOGIN_URL = "https://account.nicovideo.jp/login";
 const USER_EMAIL = "applerin1119@gmail.com";
 const USER_PASS = "rem-0202";
@@ -41,15 +41,70 @@ async function Input(display)
 //APIにコール
 async function CallApi(url)
 {
-  const res = await fetch(url,{headers: HEADER});
-  const ret = await res.json();
+  const ret = await (await fetch(url,{headers:HEADER})).json();
 
   return ret;
 };
 
-//htmlからのデータ取得
-async function MainScraping(url,title,mylistCount,mylistName,page)
+async function TagCheck(title,tag,page)
 {
+  while (true)
+  {
+    let access = await page.$eval("h1",item => item.textContent);
+
+    if (access != title)
+    {
+      console.log("error page");
+      await _sleep(60000);
+      await page.reload({waitUntil:"networkidle2"});
+    }
+    else
+    {
+      break;
+    }
+  };
+
+  let lookTagList = await page.$$("*[class^='TagItem is-locked']");
+
+  for (let lookTag of lookTagList)
+  {
+    let tagName = await lookTag.$eval("a[class='Link TagItem-name']",item => item.textContent);
+
+    if (tagName.toLowerCase() == tag)
+    {
+      return true;
+    };
+  };
+
+  return false;
+};
+
+async function MylistCheck(name,page)
+{
+  let check;
+  let button = await page.$("button.ActionButton.VideoMenuContainer-button");
+  await button.click();
+
+  await page.screenshot({path: 'ml.png'});
+
+  if (await page.$(`*[data-mylist-name='${name}']`))
+  {
+    check = true;
+  }
+  else
+  {
+    check = false;
+  }
+
+  await button.click();
+  console.log(`mylistCheck:${check}`);
+  return check;
+};
+
+//htmlからのデータ取得
+async function MainScraping(url,title,tag,/*mylistCount,*/mylistName,page)
+{
+  /*
   if (parseInt(mylistCount/500) >= 1)
   {
     let name = `${mylistName}その${parseInt(mylistCount/500)+1}`;
@@ -58,7 +113,18 @@ async function MainScraping(url,title,mylistCount,mylistName,page)
   {
     let name = mylistName;
   }
-}
+  */
+
+  await page.goto(BASE_URL + url,{waitUntil:"networkidle2"});
+  await MylistCheck(mylistName,page);
+
+  if (await TagCheck(title,tag,page) == true)
+  {
+    console.log(`ml add ${title}`)
+  }
+
+  await _sleep(10000);
+};
 
 //無名関数を作って即時実行
 async function Add()
@@ -69,6 +135,7 @@ async function Add()
 
   const browser = await puppeteer.launch({args: ['--no-sandbox','--disable-setuid-sandbox']});
   const page = await browser.newPage();
+  page.setViewport({width: 1200, height: 800});
 
   await Login(page);
 
@@ -98,7 +165,7 @@ async function Add()
     //マイリスト追加済みかチェックする
     //if Authentication
 
-    mylistCount = await MainScraping()
+    mylistCount = await MainScraping(data[0],data[1],tag,tag,page);
   }
 
   await page.screenshot({path: 'example.png'});
