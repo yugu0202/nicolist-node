@@ -25,3 +25,16 @@ services:
     hostname: postgres
     restart: always
     user: root
+
+  pgadmin4:
+    image: dpage/pgadmin4:6.1
+    container_name: pgadmin4
+    ports:
+      - 8070:80
+    volumes:
+      - ./pgadmin:/var/lib/pgadmin/storage
+    environment:
+      PGADMIN_DEFAULT_EMAIL: applerin1119@gmail.com
+      PGADMIN_DEFAULT_PASSWORD: root
+    hostname: pgadmin4
+    restart: always
