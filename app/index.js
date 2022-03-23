@@ -48,6 +48,7 @@ async function CallApi(url)
 
 async function TagCheck(title,tag,page)
 {
+  let check = false;
   while (true)
   {
     let access = await page.$eval("h1",item => item.textContent);
@@ -72,11 +73,13 @@ async function TagCheck(title,tag,page)
 
     if (tagName.toLowerCase() == tag)
     {
-      return true;
+      check = true;
+      break;
     };
   };
 
-  return false;
+  console.log(`tag check:${check}`);
+  return check;
 };
 
 async function MylistCheck(name,page)
@@ -101,26 +104,54 @@ async function MylistCheck(name,page)
   return check;
 };
 
-//htmlからのデータ取得
-async function MainScraping(url,title,tag,/*mylistCount,*/mylistName,page)
+async function MylistCreate(name,page)
 {
-  /*
-  if (parseInt(mylistCount/500) >= 1)
+  let createUrl = "https://www.nicovideo.jp/my/mylist";
+  await page.goto(createUrl,{waitUntil: 'networkidle2'});
+
+  await page.click('button.ModalActionButton.MylistsContainer-actionItem');
+
+  await page.$eval("input[name='title']", element => element.value = '');
+  await page.type("input[name='title']",name);
+
+  await page.click('label.RadioItem-label');
+  await page.click('button.ModalContent-footerSubmitButton');
+
+  console.log("mylist create");
+};
+
+async function MylistAdd(name,page)
+{
+  await page.click('button.ActionButton.VideoMenuContainer-button');
+  await page.screenshot({path: 'ml.png'});
+  await page.click(`*[data-mylist-name='${name}']`);
+  await page.click("button.ActionButton.AddMylistModal-submit");
+  console.log(`mylist add ${name}`);
+}
+
+//htmlからのデータ取得
+async function MainScraping(url,title,tag,mylistCount,mylistName,page)
+{
+  let name;
+  if (Math.floor(mylistCount/500) >= 1)
   {
-    let name = `${mylistName}その${parseInt(mylistCount/500)+1}`;
+    name = `${mylistName}その${Math.floor(mylistCount/500)+1}`;
   }
   else
   {
-    let name = mylistName;
+    name = mylistName;
   }
-  */
 
   await page.goto(BASE_URL + url,{waitUntil:"networkidle2"});
-  await MylistCheck(mylistName,page);
 
   if (await TagCheck(title,tag,page) == true)
   {
-    console.log(`ml add ${title}`)
+    if (! await MylistCheck(mylistName,page))
+    {
+      await MylistCreate(name,page);
+      await page.goto(BASE_URL + url,{waitUntil:"networkidle2"});
+    }
+    await MylistAdd(name,page);
   }
 
   await _sleep(10000);
@@ -165,7 +196,7 @@ async function Add()
     //マイリスト追加済みかチェックする
     //if Authentication
 
-    mylistCount = await MainScraping(data[0],data[1],tag,tag,page);
+    mylistCount = await MainScraping(data[0],data[1],tag,0,tag,page);
   }
 
   await page.screenshot({path: 'example.png'});
