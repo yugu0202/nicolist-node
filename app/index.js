@@ -3,8 +3,8 @@ const fetch = require('node-fetch-commonjs');
 
 const ROOT_URL = "https://www.nicovideo.jp";
 const LOGIN_URL = "https://account.nicovideo.jp/login";
-const USER_EMAIL = "applerin1119@gmail.com";
-const USER_PASS = "rem-0202";
+const USER_EMAIL = "";
+const USER_PASS = "";
 
 async function Login(page)
 {
