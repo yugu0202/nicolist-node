@@ -12,8 +12,8 @@ const _sleep = (ms) => new Promise((resolve) => setTimeout(resolve,ms));
 const HEADER = {"User-Agent":"nicolist"}
 const BASE_URL = "https://www.nicovideo.jp";
 const LOGIN_URL = "https://account.nicovideo.jp/login";
-const USER_EMAIL = "applerin1119@gmail.com";
-const USER_PASS = "rem-0202";
+const USER_EMAIL = "";
+const USER_PASS = "";
 
 //ログイン処理
 async function Login(page)
