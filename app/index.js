@@ -9,7 +9,7 @@ const reader = require("readline").createInterface({
 
 const _sleep = (ms) => new Promise((resolve) => setTimeout(resolve,ms));
 
-const HEADER = {"User-Agent":"nicolist"}
+const HEADER = {"User-Agent":"nicolist"};
 const BASE_URL = "https://www.nicovideo.jp";
 const LOGIN_URL = "https://account.nicovideo.jp/login";
 const USER_EMAIL = "";

@@ -3,4 +3,6 @@ CREATE DATABASE nicolist;
 
 \c nicolist
 
-create table tableDB(mylistName varchar(100) primary key,tableName varchar(100),mylistCount int);
+create table mylist(ID int primary key,name text);
+create table registered(movieID int primary key,title text,tableName text,mylistID int,num int,foreign key (mylistID) references mylist(ID) on delete cascade on update cascade);
+create table remove(movieID int primary key,reason text);
