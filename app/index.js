@@ -157,7 +157,6 @@ async function MainScraping(url,title,tag,mylistCount,mylistName,page)
   await _sleep(10000);
 };
 
-//無名関数を作って即時実行
 async function Add()
 {
   let tag = await Input("tag>");
