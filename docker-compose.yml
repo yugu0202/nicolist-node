@@ -10,3 +10,31 @@ services:
       - ./app:/app
       - node_modules:/app/node_modules
     working_dir: '/app'
+
+  postgresql:
+    image: postgres:13.4
+    container_name: postgresql
+    ports:
+      - 5432:5432
+    volumes:
+      - ./postgres/init:/docker-entrypoint-initdb.d
+    environment:
+      POSTGRES_USER: root
+      POSTGRES_PASSWORD: root
+      POSTGRES_INITDB_ARGS: "--encoding=UTF-8"
+    hostname: postgres
+    restart: always
+    user: root
+
+  pgadmin4:
+    image: dpage/pgadmin4:6.1
+    container_name: pgadmin4
+    ports:
+      - 8070:80
+    volumes:
+      - ./pgadmin:/var/lib/pgadmin/storage
+    environment:
+      PGADMIN_DEFAULT_EMAIL: applerin1119@gmail.com
+      PGADMIN_DEFAULT_PASSWORD: root
+    hostname: pgadmin4
+    restart: always
