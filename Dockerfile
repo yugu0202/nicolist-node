@@ -8,4 +8,4 @@ RUN apt install -y locales fonts-ipafont fonts-ipaexfont && echo "ja_JP UTF-8" >
 
 RUN apt install -y chromium
 
-CMD ["sh"]
+CMD ["node","index.js"]
